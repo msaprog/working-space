@@ -1,3 +1,4 @@
+/* eslint-disable */
 const magic = (...args) => {
   const sum = args.reduce((acc, currentValue) => (acc + currentValue), 0);
 
