@@ -30,7 +30,7 @@
 // надо через typeof проверить - это метод или нет
 // и отдать его либо со связыванием, либо без.
 
-export default (obj) => {
+const protect = (obj) => {
   // console.log(`obj - ${JSON.stringify(obj)}`);
 
   const checkProp = (prop) => (prop.slice(0, 1) === '_');
@@ -44,7 +44,7 @@ export default (obj) => {
         throw new Error(`Cannot write '${prop}'`);
       }
       if (prop in target) {
-        // console.log(`value - ${value}`);
+        console.log(`value - ${value}`);
         // const newTarget = obj.prop.bind(prop);
         // console.log(`Защита пройдена - ${newTarget.value}`);
         target[prop] = value;
@@ -58,14 +58,17 @@ export default (obj) => {
     get(target, prop) {
       if (checkProp(prop)) {
         // console.log(`Сработала защита prop - ${prop}`);
-        throw new Error(`Cannot write '${prop}'`);
+        console.log(`tatget - ${JSON.stringify(target)}`);
+        console.log(`prop - ${JSON.stringify(prop)}`);
+        console.log(`tatget[prop] - ${JSON.stringify(target[prop])}`);
+        throw new Error(`Protect property '${prop}'`);
       }
       if (prop in target) {
         if (typeof (target[prop]) === 'function') {
-          console.log(`!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! prop fun - ${target[prop]}`);
+          console.log(`!!!!!! prop fun - ${target[prop]}`);
           const newTarget = obj[prop].bind(obj[prop]);
           // newTarget.bind(newTarget);
-          console.log(`44444444444444 - ${typeof (newTarget) === 'function'}`);
+          console.log(`44444444 - ${typeof (newTarget) === 'function'}`);
           console.log(`newTarget[prop] - ${newTarget}`);
           return newTarget;
           // при успешной записи, метод get() должен вернуть значение
@@ -81,3 +84,25 @@ export default (obj) => {
   return secret;
 };
 // END
+
+class Course {
+  constructor(name) {
+    this._name = name;
+  }
+
+  getName() {
+    return this._name;
+  }
+}
+
+const course = new Course('Object-oriented design');
+const protectedCourse = protect(course);
+
+course.getName(); // "Object-oriented design"
+protectedCourse.getName(); // "Object-oriented design"
+course._name; // "Object-oriented design"
+course._nonExists; // undefined
+
+protectedCourse._name; // Error
+protectedCourse._name = 'OOD'; // Error
+protectedCourse._nonExists; // Error
