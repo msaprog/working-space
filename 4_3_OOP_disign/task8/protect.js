@@ -30,7 +30,7 @@
 // надо через typeof проверить - это метод или нет
 // и отдать его либо со связыванием, либо без.
 
-export default protect = (obj) => {
+const protect = (obj) => {
   // console.log(`obj - ${JSON.stringify(obj)}`);
 
   const checkProp = (prop) => (prop.slice(0, 1) === '_');
@@ -103,6 +103,6 @@ protectedCourse.getName(); // "Object-oriented design"
 course._name; // "Object-oriented design"
 course._nonExists; // undefined
 
-protectedCourse._name; // Error
-protectedCourse._name = 'OOD'; // Error
-protectedCourse._nonExists; // Error
+// protectedCourse._name; // Error
+// protectedCourse._name = 'OOD'; // Error
+// protectedCourse._nonExists; // Error
