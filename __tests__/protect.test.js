@@ -2,8 +2,8 @@
 /* eslint-disable no-param-reassign */
 
 import util from 'util';
-import Course from '../Course.js';
-import protect from '../protect.js';
+import Course from '../4_3_OOP_disign/task8/Course.js';
+import protect from '../4_3_OOP_disign/task8/protect.js';
 
 const hexletCourse = {
   name: 'Объектно-ориентированный дизайн',

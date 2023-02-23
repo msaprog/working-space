@@ -30,7 +30,7 @@
 // надо через typeof проверить - это метод или нет
 // и отдать его либо со связыванием, либо без.
 
-const protect = (obj) => {
+export default protect = (obj) => {
   // console.log(`obj - ${JSON.stringify(obj)}`);
 
   const checkProp = (prop) => (prop.slice(0, 1) === '_');
