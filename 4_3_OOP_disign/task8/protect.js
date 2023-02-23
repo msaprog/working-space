@@ -30,79 +30,30 @@
 // надо через typeof проверить - это метод или нет
 // и отдать его либо со связыванием, либо без.
 
-const protect = (obj) => {
-  // console.log(`obj - ${JSON.stringify(obj)}`);
-
-  const checkProp = (prop) => (prop.slice(0, 1) === '_');
+export default (obj) => {
+  const validateProperty = (target, prop) => {
+    if (!(prop in target)) {
+      throw new Error(`Property "${prop}" doesn't exist`);
+    }
+    if (prop.startsWith('_')) {
+      throw new Error(`Property "${prop}" is protected`);
+    }
+  };
 
   const secret = new Proxy(obj, {
     set(target, prop, value) {
-      // если свойство есть в объекте, proxy позволяет нам его переписать
-      // console.log(`target - ${JSON.stringify(target)}, prop - ${prop}, value - ${value}`);
-      if (checkProp(prop)) {
-        // console.log(`Сработала защита - ${prop}, first - ${prop.slice(0, 1)}`);
-        throw new Error(`Cannot write '${prop}'`);
-      }
-      if (prop in target) {
-        console.log(`value - ${value}`);
-        // const newTarget = obj.prop.bind(prop);
-        // console.log(`Защита пройдена - ${newTarget.value}`);
-        target[prop] = value;
-        // при успешной записи, метод set() должен вернуть true (target[prop])
-        return true;
-        // return true;
-      }
-      // если свойства нет в объекте, то выбросится ошибка, либо можем вернуть false
-      throw new Error(`Cannot rewrite non-existed property '${prop}'`);
+      validateProperty(target, prop);
+      target[prop] = value;
+      return true;
     },
     get(target, prop) {
-      if (checkProp(prop)) {
-        // console.log(`Сработала защита prop - ${prop}`);
-        console.log(`tatget - ${JSON.stringify(target)}`);
-        console.log(`prop - ${JSON.stringify(prop)}`);
-        console.log(`tatget[prop] - ${JSON.stringify(target[prop])}`);
-        throw new Error(`Protect property '${prop}'`);
+      validateProperty(target, prop);
+      if (typeof (target[prop]) === 'function') {
+        return target[prop].bind(obj);
       }
-      if (prop in target) {
-        if (typeof (target[prop]) === 'function') {
-          console.log(`!!!!!! prop fun - ${target[prop]}`);
-          const newTarget = obj[prop].bind(obj[prop]);
-          // newTarget.bind(newTarget);
-          console.log(`44444444 - ${typeof (newTarget) === 'function'}`);
-          console.log(`newTarget[prop] - ${newTarget}`);
-          return newTarget;
-          // при успешной записи, метод get() должен вернуть значение
-        }
-        // console.log(`2222222222222222222222222222222222  prop fun - ${prop}`);
-        return target[prop];
-      }
-      // если свойства нет в объекте, то выбросится ошибка, либо можем вернуть false
-      throw new Error(`Cannot rewrite non-existed property '${prop}'`);
+      return target[prop];
     },
-
   });
   return secret;
 };
 // END
-
-class Course {
-  constructor(name) {
-    this._name = name;
-  }
-
-  getName() {
-    return this._name;
-  }
-}
-
-const course = new Course('Object-oriented design');
-const protectedCourse = protect(course);
-
-course.getName(); // "Object-oriented design"
-protectedCourse.getName(); // "Object-oriented design"
-course._name; // "Object-oriented design"
-course._nonExists; // undefined
-
-// protectedCourse._name; // Error
-// protectedCourse._name = 'OOD'; // Error
-// protectedCourse._nonExists; // Error
